@@ -1,0 +1,68 @@
+Client-side program
+ 
+//client.java
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.net.Socket;
+import java.util.Scanner;
+ 
+public class client 
+{
+@Override
+public void run()
+{
+   try
+       {
+           Socket rs=new Socket("localhost",5000);
+           Scanner sd=new Scanner(System.in);
+           System.out.println("Beverage code");
+           int id=sd.nextInt();
+           System.out.println("Number of cups");
+           double amt=sd.nextDouble();
+           
+           //send
+           DataOutputStream dos=new DataOutputStream(rs.getOutputStream());
+           dos.writeInt(id);
+           dos.writeDouble(amt);
+           dos.flush();
+           
+                     
+           //recive
+           DataInputStream dis=new DataInputStream(st.getInputStream());
+           double bs=dis.readDouble();
+           double pw=dis.readDouble();
+           System.out.println("The Bonus Points="+bs);
+           System.out.println("The Point Worth="+pw);
+           try
+           {
+            double up = dis.readDouble();
+            double uw = dis.readDouble();
+            System.out.println("The Updated Bonus Points="+bs);
+            System.out.println("The Upadted Point Worth="+pw);
+           }
+           catch(EOFException e)
+           {
+            System.out.println("Record not found on the database table");  
+           }
+       }
+       catch(Exception e)
+       {
+           System.out.println(e);
+       }
+   }
+ 
+}
+ 
+//mainClient.java
+public class mainClient
+{
+   public static void main(String args[])
+   {
+       client putta_21s20852=new client();
+       Thread t_putta=new Thread(putta_21s20852);
+       t_putta.start();
+   }
+}
+
+
