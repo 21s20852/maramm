@@ -1,0 +1,100 @@
+Server-side program
+//server.java
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+ 
+public class server 
+{
+   @Override
+   public void run()
+   {
+     try
+       {
+           String host = "jdbc:derby://localhost:1527/custDB";
+           String un="root";
+           String pass="root";
+           Connection con = DriverManager.getConnection(host,un,pass);
+           ServerSocket sr = new ServerSocket(5000);
+           System.out.println("connection is ready");
+ 
+           while(true)
+           {
+                //accept client connection
+                Socket s = ss.accept();
+               
+                //receive data from client
+                DataInputStream dis = new  DataInputStream(st.getInputStream());
+                int id = dis.readInt();
+                int amnt = dis.readInt();
+                System.out.println("Customer Id :" +id);
+                System.out.println("Amount :" +amnt);
+               
+                //do calculations
+                double tp = (50)*amnt;
+                double worth =  tp * (0.002);
+               
+                //send the results
+                DataOutputStream dos = new DataOutputStream(st.getOutputStream());
+                dos.writeDouble(tp);
+                dos.writeDouble(worth);
+                   
+                //finding the customer ID from the database
+                Statement smt = con.createStatement();
+                String getvals = ("select *from customer where CustNumber =" +id);
+                smt.execute(getvals);
+                ResultSet rs = smt.getResultSet();
+                   
+                if(rs.next())
+                {
+                             
+                   double temp_pnt = rs.getDouble("BonusPoint");
+                   double temp_m_val = rs.getDouble("MonetoryValue");
+ 
+                   double r1 = temp_pnt + tp;
+                   double r2 = temp_m_val +worth;
+                   dos.writeDouble(r1);
+                   dos.writeDouble(r2);
+                                 
+                   smt.executeUpdate("update CUSTOMER set BonusPoint=" + r1 + ", MonetoryValue="+ r2 + " WHERE CustNumber=" + id);
+                   System.out.println("Recored has been updated on the database and sent to the client side");
+                 }
+                 else
+                 {
+                   
+                    dos.writeInt(id);
+                    System.out.println("Customer ID not found in the table and recored is not updated of Id number: " + id);
+                 }
+                  dos.flush();
+                  dos.close();
+               }
+          }
+        catch(IOException ex)
+        {
+           System.out.print(ex);
+        } catch (SQLException ex) {
+           Logger.getLogger(server.class.getName()).log(Level.SEVERE, null, ex);
+       }
+   }
+}  
+//mainServer.java
+public class mainServer
+{
+   public static void main(String args[])
+   {
+       server putta_21s208=new server();
+       Thread t_21s20852=new Thread(putta_21s2085);
+       t_21s20852start();
+       
+   }
+ 
+}
